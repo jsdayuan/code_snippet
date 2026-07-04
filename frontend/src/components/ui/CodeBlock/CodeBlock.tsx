@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Prism from 'prismjs';
 import 'prismjs/themes/prism-tomorrow.css';
 import 'prismjs/components/prism-markup';
@@ -33,17 +33,46 @@ export interface CodeBlockProps {
 
 export const CodeBlock: React.FC<CodeBlockProps> = ({ code, language }) => {
   const codeRef = useRef<HTMLElement>(null);
+  const fullscreenCodeRef = useRef<HTMLElement>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
     if (codeRef.current) {
       try {
         Prism.highlightElement(codeRef.current);
       } catch (err) {
-        // 防止 Prism 高亮失败导致整个页面崩溃
         console.warn('Prism highlight failed:', err);
       }
     }
   }, [code, language]);
+
+  useEffect(() => {
+    if (isFullscreen && fullscreenCodeRef.current) {
+      try {
+        Prism.highlightElement(fullscreenCodeRef.current);
+      } catch (err) {
+        console.warn('Prism highlight failed in fullscreen:', err);
+      }
+    }
+  }, [isFullscreen, code, language]);
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isFullscreen) {
+        setIsFullscreen(false);
+      }
+    };
+
+    if (isFullscreen) {
+      document.addEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'hidden';
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = '';
+    };
+  }, [isFullscreen]);
 
   const getPrismLanguage = (lang: string): string => {
     const map: Record<string, string> = {
@@ -78,21 +107,57 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({ code, language }) => {
     return map[lang.toLowerCase()] || 'javascript';
   };
 
+  const handleFullscreenClick = () => {
+    setIsFullscreen(true);
+  };
+
+  const handleCloseFullscreen = () => {
+    setIsFullscreen(false);
+  };
+
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <div className={styles.dots}>
-          <span className={`${styles.dot} ${styles.red}`} />
-          <span className={`${styles.dot} ${styles.yellow}`} />
-          <span className={`${styles.dot} ${styles.green}`} />
+    <>
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <div className={styles.dots}>
+            <span className={clsx(styles.dot, styles.red)} />
+            <span className={clsx(styles.dot, styles.yellow)} />
+            <span className={clsx(styles.dot, styles.green)} onClick={handleFullscreenClick} />
+          </div>
+          <span className={styles.languageLabel}>{language}</span>
         </div>
-        <span className={styles.languageLabel}>{language}</span>
+        <pre className={styles.code}>
+          <code ref={codeRef} className={`language-${getPrismLanguage(language)}`}>
+            {code}
+          </code>
+        </pre>
       </div>
-      <pre className={styles.code}>
-        <code ref={codeRef} className={`language-${getPrismLanguage(language)}`}>
-          {code}
-        </code>
-      </pre>
-    </div>
+
+      {isFullscreen && (
+        <div className={styles.fullscreenBackdrop} onClick={handleCloseFullscreen}>
+          <div className={styles.fullscreenPanel} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.fullscreenHeader}>
+              <div className={styles.dots}>
+                <span className={clsx(styles.dot, styles.red)} onClick={handleCloseFullscreen} />
+                <span className={clsx(styles.dot, styles.yellow)} />
+                <span className={clsx(styles.dot, styles.green)} />
+              </div>
+              <span className={styles.fullscreenLanguageLabel}>{language}</span>
+            </div>
+            <div className={styles.fullscreenContent}>
+              <pre className={styles.fullscreenCode}>
+                <code ref={fullscreenCodeRef} className={`language-${getPrismLanguage(language)}`}>
+                  {code}
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
+
+function clsx(...classes: (string | boolean | undefined | null)[]): string {
+  return classes.filter(Boolean).join(' ');
+}

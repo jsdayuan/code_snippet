@@ -23,6 +23,11 @@
   width: 12px;
   height: 12px;
   border-radius: 50%;
+  transition: all var(--transition-fast);
+}
+
+.dot:hover {
+  opacity: 0.7;
 }
 
 .red {
@@ -35,6 +40,11 @@
 
 .green {
   background-color: #28ca42;
+  cursor: pointer;
+}
+
+.green:hover {
+  background-color: #34c759;
 }
 
 .languageLabel {
@@ -68,6 +78,98 @@
   line-height: 1.6 !important;
 }
 
+.fullscreenBackdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn var(--transition-normal);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fullscreenPanel {
+  width: 95vw;
+  max-width: 1400px;
+  height: 90vh;
+  background-color: #1e1e1e;
+  border-radius: var(--radius-xl);
+  box-shadow: 0 25px 100px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideIn var(--transition-spring);
+}
+
+@keyframes slideIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.fullscreenHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  background-color: #151515;
+  border-bottom: 1px solid #3a3a3a;
+}
+
+.fullscreenLanguageLabel {
+  font-size: 14px;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-left: auto;
+  font-weight: var(--fontWeights.medium);
+}
+
+.fullscreenContent {
+  flex: 1;
+  overflow: auto;
+  padding: var(--space-6);
+}
+
+.fullscreenCode {
+  margin: 0;
+  padding: 0;
+  font-family: 'SF Mono', 'Fira Code', 'Monaco', 'Consolas', monospace;
+  font-size: 15px;
+  line-height: 1.7;
+  white-space: pre;
+  word-wrap: normal;
+}
+
+.fullscreenCode :global(pre) {
+  margin: 0;
+  background: none !important;
+  padding: 0 !important;
+}
+
+.fullscreenCode :global(code) {
+  font-family: 'SF Mono', 'Fira Code', 'Monaco', 'Consolas', monospace !important;
+  font-size: 15px !important;
+  line-height: 1.7 !important;
+}
+
 @media (max-width: 640px) {
   .code {
     font-size: 12px;
@@ -76,5 +178,21 @@
 
   .code :global(code) {
     font-size: 12px !important;
+  }
+
+  .fullscreenPanel {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+  }
+
+  .fullscreenCode {
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .fullscreenCode :global(code) {
+    font-size: 13px !important;
+    line-height: 1.6 !important;
   }
 }
