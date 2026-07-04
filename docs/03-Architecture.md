@@ -9,39 +9,29 @@
 │  │  React + Vite + TypeScript + CSS Modules               │  │
 │  │  - 自研UI组件库                                         │  │
 │  │  - React Context 状态管理                               │  │
-│  │  - PrismJS 语法高亮                                     │  │
+│  │  - localStorage 数据持久化                              │  │
 │  └───────────────────────────────────────────────────────┘  │
-│                        │ HTTP/JSON                          │
-├────────────────────────┼────────────────────────────────────┤
+│                        │                                    │
 │                        ▼                                    │
 │  ┌───────────────────────────────────────────────────────┐  │
-│  │  NestJS + TypeScript                                   │  │
-│  │  - Controller (REST API)                               │  │
-│  │  - Service (Business Logic)                            │  │
-│  │  - Repository (Mongoose)                               │  │
-│  └───────────────────────────────────────────────────────┘  │
-│                        │ Mongoose Driver                    │
-├────────────────────────┼────────────────────────────────────┤
-│                        ▼                                    │
-│  ┌───────────────────────────────────────────────────────┐  │
-│  │  MongoDB 7.0                                           │  │
-│  │  - snippets collection                                 │  │
+│  │  localStorage                                          │  │
+│  │  - code_snippet_user_id (用户标识)                      │  │
+│  │  - code_snippet_vault (代码片段数据)                    │  │
 │  └───────────────────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ## 2. 技术架构特点
 
-- **前后端分离**：前端独立部署，通过RESTful API通信
+- **纯前端应用**：无后端服务，无数据库，所有数据存储在客户端
 - **单页应用（SPA）**：React Router客户端路由，创建/编辑使用SlideOver不跳转
-- **无状态服务端**：NestJS不保存会话状态，便于水平扩展
-- **文档数据库**：MongoDB存储灵活的Snippet结构
+- **客户端存储**：localStorage持久化数据，每个用户数据独立隔离
+- **用户标识**：首次访问自动生成唯一userId，存储在localStorage中
 
 ## 3. 项目目录结构
 
 ```
 code-snippet-vault/
-├── docker-compose.yml
 ├── README.md
 ├── frontend/                          # 前端项目
 │   ├── index.html
@@ -59,11 +49,10 @@ code-snippet-vault/
 │       │   ├── languages.ts           # 支持的语言列表
 │       │   └── theme.ts               # 设计系统常量（颜色、间距等）
 │       ├── utils/
-│       │   ├── api.ts                 # Axios实例配置
 │       │   ├── formatDate.ts          # 日期格式化
 │       │   └── debounce.ts            # 防抖函数
 │       ├── services/
-│       │   └── snippetApi.ts          # Snippet API封装
+│       │   └── storageService.ts      # localStorage存储服务
 │       ├── context/
 │       │   └── AppContext.tsx         # 全局状态Context
 │       ├── hooks/
@@ -80,8 +69,6 @@ code-snippet-vault/
 │       └── components/
 │           ├── ui/                    # 基础UI组件（自研）
 │           │   ├── Button/
-│           │   │   ├── Button.tsx
-│           │   │   └── Button.module.css
 │           │   ├── Input/
 │           │   ├── TextArea/
 │           │   ├── Select/
@@ -96,213 +83,73 @@ code-snippet-vault/
 │           ├── layout/                # 布局组件
 │           │   ├── Header/
 │           │   └── Footer/
-│           ├── snippet/               # 业务组件
-│           │   ├── SnippetCard/
-│           │   ├── SnippetForm/
-│           │   ├── SnippetDetail/
-│           │   ├── SnippetList/
-│           │   ├── FilterBar/
-│           │   ├── CodeBlock/
-│           │   ├── CodeEditor/
-│           │   ├── LanguageBadge/
-│           │   └── TagInput/
-│           └── icons/                 # 图标组件（Lucide封装）
-│
-├── backend/                           # 后端项目
-│   ├── package.json
-│   ├── tsconfig.json
-│   ├── nest-cli.json
-│   ├── Dockerfile
-│   └── src/
-│       ├── main.ts                    # 应用入口
-│       ├── app.module.ts              # 根模块
-│       ├── config/
-│       │   └── database.config.ts     # 数据库配置
-│       ├── common/                    # 公共模块
-│       │   ├── filters/
-│       │   │   └── http-exception.filter.ts
-│       │   ├── interceptors/
-│       │   │   └── transform.interceptor.ts
-│       │   └── dto/
-│       │       └── api-response.dto.ts
-│       └── snippets/                  # Snippet模块
-│           ├── snippets.module.ts
-│           ├── snippets.controller.ts
-│           ├── snippets.service.ts
-│           ├── snippets.repository.ts
-│           ├── dto/
-│           │   ├── create-snippet.dto.ts
-│           │   └── update-snippet.dto.ts
-│           ├── entities/
-│           │   └── snippet.entity.ts
-│           └── schemas/
-│               └── snippet.schema.ts
-│
-└── docs/                              # 项目文档
-    ├── 01-SRS.md
-    ├── 02-SDS.md
-    ├── 03-Architecture.md
-    ├── 04-API.md
-    ├── 05-Database.md
-    ├── 06-Code-Convention.md
-    ├── 07-Development-Plan.md
-    ├── 08-Deployment.md
-    ├── 09-AI-Development-Rules.md
-    └── 10-UI-UX-Design.md
+│           └── snippet/               # 业务组件
+│               ├── SnippetCard/
+│               ├── SnippetForm/
+│               ├── SnippetList/
+│               ├── FilterBar/
+│               └── LanguageBadge/
 ```
 
-## 4. 模块依赖关系
+## 4. 核心模块说明
 
-### 4.1 前端模块依赖
+### 4.1 存储服务层（StorageService）
 
-```
-App.tsx
-├── AppContext (全局状态)
-│   ├── searchQuery, selectedTags, selectedLanguage
-│   ├── snippets (列表数据)
-│   ├── isSlideOverOpen, currentSnippet
-│   └── toast
-│
-├── HomePage
-│   ├── Header
-│   │   ├── Logo
-│   │   ├── SearchBar ──→ useSearch (防抖300ms)
-│   │   └── Button (新建)
-│   ├── FilterBar
-│   │   ├── Tag[] (标签筛选)
-│   │   └── Select (语言筛选)
-│   └── SnippetList
-│       ├── SnippetCard[] ──→ Card + LanguageBadge + Tag[]
-│       ├── EmptyState (无数据)
-│       └── Skeleton[] (加载中)
-│
-├── SlideOver (创建/编辑/详情)
-│   ├── SnippetForm (创建/编辑模式)
-│   │   ├── Input (标题)
-│   │   ├── Select (语言)
-│   │   ├── TagInput (标签)
-│   │   ├── TextArea (描述)
-│   │   ├── CodeEditor (代码) ──→ PrismJS
-│   │   └── Button[] (保存/取消)
-│   └── SnippetDetail (查看模式)
-│       ├── LanguageBadge
-│       ├── Tag[]
-│       ├── Text (描述)
-│       ├── CodeBlock (代码) ──→ PrismJS + CopyButton
-│       └── Button[] (编辑/删除)
-│
-├── Toast (全局提示)
-└── Alert (确认对话框)
-```
+位于 `src/services/storageService.ts`，封装 localStorage 操作：
 
-### 4.2 后端模块依赖
+- `getUserId()` - 获取或生成用户唯一标识
+- `getSnippets()` - 获取所有代码片段（含初始化示例数据）
+- `saveSnippets()` - 保存代码片段数组
+- `createSnippet()` - 创建新代码片段
+- `updateSnippet()` - 更新代码片段
+- `deleteSnippet()` - 删除代码片段
+- `searchSnippets()` - 关键词搜索
+- `filterSnippets()` - 按语言和标签筛选
+
+### 4.2 状态管理（AppContext）
+
+位于 `src/context/AppContext.tsx`，管理全局应用状态：
+
+- snippets - 当前显示的代码片段列表
+- searchQuery - 搜索关键词
+- selectedTags - 选中的标签筛选条件
+- selectedLanguage - 选中的语言筛选条件
+- slideOver状态 - 侧边栏面板状态
+- toast状态 - 消息提示状态
+- alert状态 - 确认对话框状态
+
+### 4.3 自定义Hooks
+
+| Hook | 功能 |
+|------|------|
+| useSnippets | 获取片段列表和加载状态 |
+| useSearch | 防抖搜索功能 |
+| useClipboard | 剪贴板复制功能 |
+
+## 5. 数据流向
 
 ```
-AppModule
-├── ConfigModule (环境变量)
-├── MongooseModule (数据库连接)
-└── SnippetsModule
-    ├── SnippetsController (/api/snippets)
-    │   ├── GET / (getAll, 支持query过滤)
-    │   ├── GET /:id (getById)
-    │   ├── POST / (create)
-    │   ├── PATCH /:id (update)
-    │   ├── DELETE /:id (delete)
-    │   └── GET /search (search)
-    ├── SnippetsService
-    │   ├── findAll(filter)
-    │   ├── findOne(id)
-    │   ├── create(dto)
-    │   ├── update(id, dto)
-    │   ├── remove(id)
-    │   └── search(keyword)
-    └── SnippetsRepository (MongooseModel封装)
-        └── SnippetModel (MongoDB Collection)
+用户操作 → AppContext dispatch → 状态更新 → UI渲染
+         ↓
+StorageService 读写 localStorage
+         ↓
+数据持久化存储
 ```
 
-## 5. 数据流
-
-### 5.1 列表加载流程
+## 6. 首次访问流程
 
 ```
-[HomePage Mount]
+用户首次访问
     ↓
-[useSnippets Hook] ──→ [GET /api/snippets]
-    ↓                           ↓
-[AppContext: snippets] ←── [SnippetsController]
-    ↓                           ↓
-[SnippetList渲染] ←────── [SnippetsService]
-                                ↓
-                          [SnippetsRepository]
-                                ↓
-                          [MongoDB: snippets]
+检查 localStorage 中是否存在 userId
+    ↓
+否 → 生成唯一 userId → 存储到 localStorage
+是 → 读取已有 userId
+    ↓
+检查 localStorage 中是否存在 snippets
+    ↓
+否 → 初始化示例数据 → 存储到 localStorage
+是 → 读取已有数据
+    ↓
+渲染应用界面
 ```
-
-### 5.2 创建流程
-
-```
-[点击"新建"]
-    ↓
-[AppContext: isSlideOverOpen = true]
-    ↓
-[SlideOver打开动画(350ms)]
-    ↓
-[填写表单] ──→ [实时验证(class-validator)]
-    ↓
-[点击保存]
-    ↓
-[POST /api/snippets] ──→ [创建成功]
-    ↓                           ↓
-[AppContext更新列表] ←──── [返回新Snippet]
-    ↓
-[SlideOver关闭 + Toast提示]
-    ↓
-[新卡片顶部stagger淡入]
-```
-
-### 5.3 搜索流程
-
-```
-[输入关键词]
-    ↓
-[300ms 防抖]
-    ↓
-[GET /api/snippets/search?keyword=xxx]
-    ↓
-[AppContext更新snippets]
-    ↓
-[SnippetList重新渲染(stagger动画)]
-```
-
-## 6. 部署架构
-
-```
-┌──────────────────────────────────────────┐
-│           Docker Compose网络              │
-│                                          │
-│  ┌──────────────┐    ┌──────────────┐   │
-│  │  frontend    │    │  backend     │   │
-│  │  (Nginx)     │    │  (NestJS)    │   │
-│  │  Port: 80    │    │  Port: 3000  │   │
-│  └──────────────┘    └──────┬───────┘   │
-│                             │            │
-│                      ┌──────┴───────┐    │
-│                      │  mongodb     │    │
-│                      │  Port: 27017 │    │
-│                      └──────────────┘    │
-└──────────────────────────────────────────┘
-```
-
-### 6.1 容器说明
-
-| 容器 | 镜像 | 端口 | 作用 |
-|------|------|------|------|
-| frontend | nginx:alpine | 80 | 静态资源托管，API请求代理到backend |
-| backend | node:20-alpine | 3000 | NestJS应用服务 |
-| mongodb | mongo:7 | 27017 | 文档数据库 |
-
-### 6.2 网络通信
-
-- frontend → backend：Docker内部网络，通过服务名`backend:3000`通信
-- backend → mongodb：Docker内部网络，通过服务名`mongodb:27017`通信
-- 外部 → frontend：通过宿主机的80端口访问

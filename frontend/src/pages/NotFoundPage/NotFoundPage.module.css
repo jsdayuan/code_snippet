@@ -1,0 +1,51 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8);
+}
+
+.content {
+  text-align: center;
+  max-width: 400px;
+}
+
+.iconContainer {
+  width: 80px;
+  height: 80px;
+  background-color: var(--color-surface);
+  border-radius: var(--radius-xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--space-6);
+}
+
+.icon {
+  color: var(--color-text-tertiary);
+}
+
+.title {
+  font-size: 64px;
+  font-weight: var(--fontWeights-bold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-4);
+}
+
+.description {
+  font-size: var(--fontSizes.h2);
+  font-weight: var(--fontWeights.semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.subDescription {
+  font-size: var(--fontSizes.body);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-8);
+}
+
+.buttonIcon {
+  margin-right: var(--space-2);
+}

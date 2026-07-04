@@ -1,0 +1,24 @@
+.footer {
+  background-color: var(--color-surface-secondary);
+  border-top: 1px solid var(--color-border-light);
+  padding: var(--space-8) var(--space-6);
+  margin-top: var(--space-12);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.text {
+  font-size: var(--fontSizes-bodySmall);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-1);
+  font-weight: var(--fontWeights-medium);
+}
+
+.copyright {
+  font-size: var(--fontSizes-caption);
+  color: var(--color-text-tertiary);
+}

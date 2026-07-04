@@ -1,0 +1,55 @@
+export const SUPPORTED_LANGUAGES = [
+  'javascript',
+  'typescript',
+  'python',
+  'java',
+  'go',
+  'rust',
+  'css',
+  'html',
+  'shell',
+  'sql',
+  'json',
+  'yaml',
+  'markdown',
+  'c',
+  'cpp',
+] as const;
+
+export type Language = typeof SUPPORTED_LANGUAGES[number];
+
+export const LANGUAGE_LABELS: Record<Language, string> = {
+  javascript: 'JavaScript',
+  typescript: 'TypeScript',
+  python: 'Python',
+  java: 'Java',
+  go: 'Go',
+  rust: 'Rust',
+  css: 'CSS',
+  html: 'HTML',
+  shell: 'Shell',
+  sql: 'SQL',
+  json: 'JSON',
+  yaml: 'YAML',
+  markdown: 'Markdown',
+  c: 'C',
+  cpp: 'C++',
+};
+
+export const LANGUAGE_COLORS: Record<Language, { color: string; bg: string }> = {
+  javascript: { color: '#F7DF1E', bg: 'rgba(247, 223, 30, 0.15)' },
+  typescript: { color: '#3178C6', bg: 'rgba(49, 120, 198, 0.15)' },
+  python: { color: '#3776AB', bg: 'rgba(55, 118, 171, 0.15)' },
+  java: { color: '#007396', bg: 'rgba(0, 115, 150, 0.15)' },
+  go: { color: '#00ADD8', bg: 'rgba(0, 173, 216, 0.15)' },
+  rust: { color: '#DEA584', bg: 'rgba(222, 165, 132, 0.15)' },
+  css: { color: '#264DE4', bg: 'rgba(38, 77, 228, 0.15)' },
+  html: { color: '#E34F26', bg: 'rgba(227, 79, 38, 0.15)' },
+  shell: { color: '#4EAA25', bg: 'rgba(78, 170, 37, 0.15)' },
+  sql: { color: '#F29111', bg: 'rgba(242, 145, 17, 0.15)' },
+  json: { color: '#000000', bg: 'rgba(0, 0, 0, 0.1)' },
+  yaml: { color: '#CB171E', bg: 'rgba(203, 23, 30, 0.15)' },
+  markdown: { color: '#083fa1', bg: 'rgba(8, 63, 161, 0.15)' },
+  c: { color: '#555555', bg: 'rgba(85, 85, 85, 0.15)' },
+  cpp: { color: '#00599C', bg: 'rgba(0, 89, 156, 0.15)' },
+};

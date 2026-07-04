@@ -1,0 +1,60 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: backdropFadeIn var(--transition-normal);
+}
+
+@keyframes backdropFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.panel {
+  background-color: var(--color-background);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  max-width: 320px;
+  width: 90%;
+  box-shadow: var(--shadow-xl);
+  animation: panelFadeIn var(--transition-spring);
+}
+
+@keyframes panelFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.title {
+  font-size: var(--fontSizes.h3);
+  font-weight: var(--fontWeights.semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.message {
+  font-size: var(--fontSizes.body);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-6);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}
